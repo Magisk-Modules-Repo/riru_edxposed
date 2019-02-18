@@ -2,15 +2,18 @@
 
 ## Introduction
 
-**EdXposed is a framework to use Xposed module that support Android 5.0 ~ 9.0.**
+EdXposed is a Magisk & Riru module that provides original Xposed frameworks on Android devices.
+
+Compatible with Android versions from 5.0 to 9.0 (and will support Android Q).
 
 ## Differences between EdXposed and Xposed
 
-1. EdXposed supports Android Pie.
+1. EdXposed is compatible with Android Pie. (resource hook development still in progress)
 2. EdXposed have Black-list mode or White-list mode, that you can choose app you don't want to hook or choose app you want to apply Xposed modules.
-3. EdXposed have Instant-module mode, reboot system to refresh Xposed enabled module list is unnecessary.
-4. EdXposed use [Riru](https://github.com/RikkaApps/Riru) to mount, so it is hard to detect.
-5. and more...
+3. EdXposed offers Compatibility mode for target applications, in case of compatibility issues or Xposed detection.
+4. EdXposed have Instant-module mode, reboot system to refresh Xposed enabled module list is unnecessary.
+5. EdXposed is powered by Magisk and [Riru](https://github.com/RikkaApps/Riru), making it harder to be detected by legacy methods, in most cases it will not alter Safetynet CTS
+6. and more...
 
 ## Usage
 
