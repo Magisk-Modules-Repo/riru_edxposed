@@ -24,8 +24,12 @@ Compatible with Android versions from 5.0 to 9.0 (and will support Android Q).
 
 ## Get help
 
-*GitHub issues (recommend): [Github Issues](https://github.com/solohsu/EdXposed/issues/)
-*QQ Group (recommend): [855219808](http://shang.qq.com/wpa/qunwpa?idkey=fae42a3dba9dc758caf63e971be2564e67bf7edd751a2ff1c750478b0ad1ca3f)
-*Forum: [Android Forum](https://af.meowcat.org/)
-*Telegream: [Code_of_MeowCat](http://t.me/Code_of_MeowCat)
-*Discord: [Code_of_MeowCat](https://discord.gg/Hag6gNh)
+GitHub issues (recommend): [Github Issues](https://github.com/solohsu/EdXposed/issues/)
+
+QQ Group (recommend): [855219808](http://shang.qq.com/wpa/qunwpa?idkey=fae42a3dba9dc758caf63e971be2564e67bf7edd751a2ff1c750478b0ad1ca3f)
+
+Forum: [Android Forum](https://af.meowcat.org/)
+
+Telegream: [Code_of_MeowCat](http://t.me/Code_of_MeowCat)
+
+Discord: [Code_of_MeowCat](https://discord.gg/Hag6gNh)
