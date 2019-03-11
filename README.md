@@ -17,10 +17,10 @@ Compatible with Android versions from 5.0 to 9.0 (and will support Android Q).
 
 ## Usage
 
-1. Install Magisk.
-2. Install [Riru-core](https://github.com/RikkaApps/Riru/releases) in Magisk Manager or Recovery.
-2. Install [EdXposed](https://github.com/Elder-Drivers/EdXposed/releases) in Magisk Manager or Recovery.
-3. Install [EdXposed Manager](https://github.com/Elder-Drivers/EdXposed/releases).
+1. Install [Magisk](https://github.com/topjohnwu/Magisk/releases).
+2. Install [Riru-core](https://github.com/RikkaApps/Riru/releases) in Magisk Manager or Recovery mode.
+2. Install [EdXposed](https://github.com/ElderDrivers/EdXposed/releases) in Magisk Manager or Recovery mode.
+3. Install [EdXposed Installer](https://github.com/solohsu/XposedInstaller/releases).
 
 ## Get help
 
