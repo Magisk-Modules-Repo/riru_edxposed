@@ -4,7 +4,7 @@
 
 EdXposed is a Magisk & Riru module that provides original Xposed frameworks on Android devices.
 
-Compatible with Android versions from 5.0 to 9.0 (and will support Android Q).
+Compatible with Android versions from 6.0 to 9.0 (and will support Android Q).
 
 ## Differences between EdXposed and Xposed
 

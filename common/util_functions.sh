@@ -1,6 +1,5 @@
 #!/system/bin/sh
-
-EDXP_VERSION="0.3.1.7_beta (3170)"
+EDXP_VERSION="0.4.1.2_beta (4120)"
 ANDROID_SDK=`getprop ro.build.version.sdk`
 BUILD_DESC=`getprop ro.build.description`
 PRODUCT=`getprop ro.build.product`
@@ -11,7 +10,6 @@ ARCH=`getprop ro.product.cpu.abi`
 DEVICE=`getprop ro.product.device`
 ANDROID=`getprop ro.build.version.release`
 BUILD=`getprop ro.build.id`
-
 setup_log_path () {
   EDXP_INSTALLER=com.solohsu.android.edxp.manager
   EDXP_MANAGER=org.meowcat.edxposed.manager
@@ -43,7 +41,6 @@ setup_log_path () {
   LOG_VERBOSE=true
   if [[ -f ${DISABLE_VERBOSE_LOG_FILE} ]]; then LOG_VERBOSE=false; fi
 }
-
 start_log_cather () {
   LOG_FILE_NAME=$1
   LOG_TAG_FILTERS=$2
@@ -77,18 +74,14 @@ start_log_cather () {
   echo "Product: ${PRODUCT}">>${LOG_FILE}
   logcat -f ${LOG_FILE} *:S ${LOG_TAG_FILTERS} &
 }
-
 start_verbose_log_catcher () {
   start_log_cather all.log "EdXposed-Fwk:V EdXposed-dexmaker:V XSharedPreferences:V EdXposed-Bridge:V EdXposed-YAHFA:V EdXposed-Core-Native:V EdXposed-Manager:V XposedInstaller:V" true ${LOG_VERBOSE}
 }
-
 start_bridge_log_catcher () {
   start_log_cather error.log "XSharedPreferences:V EdXposed-Bridge:V" true true
 }
-
 start_log_catchers () {
   start_bridge_log_catcher
   start_verbose_log_catcher
 }
-
 setup_log_path
