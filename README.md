@@ -2,18 +2,22 @@
 
 ## Introduction
 
-EdXposed is a Magisk & Riru module that provides original Xposed frameworks on Android devices.
-
-Compatible with Android versions from 6.0 to 9.0 (and will support Android Q).
+EdXposed is a Magisk & [Riru](https://github.com/RikkaApps/Riru) module that provides Xposed framework on Android devices running Android Oreo(8.x) or Android Pie(9.0).
 
 ## Differences between EdXposed and Xposed
 
-1. EdXposed is compatible with Android Pie. (resource hook development still in progress)
-2. EdXposed have Black-list mode or White-list mode, that you can choose app you don't want to hook or choose app you want to apply Xposed modules.
-3. EdXposed offers Compatibility mode for target applications, in case of compatibility issues or Xposed detection.
-4. EdXposed have Instant-module mode, reboot system to refresh Xposed enabled module list is unnecessary.
-5. EdXposed is powered by Magisk and [Riru](https://github.com/RikkaApps/Riru), making it harder to be detected by legacy methods, in most cases it will not alter Safetynet CTS
-6. and more...
+- EdXposed supports Android Pie.
+- EdXposed have a built-in black/white list mode, with which you can choose apps you don't want to hook into and vice versa.
+- EdXposed provides a so called instant modules mode(not recommended for normal users), which makes debugging and testing of modules more convenient and efficient.
+- EdXposed can pass SafetyNet checking on most devices.
+
+## Differences between Yahfa variant and SandHook variant
+
+- The only difference is the underlying ART hooking framework: Yahfa variant uses [Yahfa](https://github.com/rk700/YAHFA) while SandHook variant uses [SandHook](https://github.com/ganyao114/SandHook)
+
+### Which one to use
+
+- Just try them out and choose the stabler and smoother one for yourself.
 
 ## Usage
 
