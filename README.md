@@ -24,7 +24,7 @@ EdXposed is a Magisk & [Riru](https://github.com/RikkaApps/Riru) module that pro
 1. Install [Magisk](https://github.com/topjohnwu/Magisk/releases).
 2. Install [Riru-core](https://github.com/RikkaApps/Riru/releases) in Magisk Manager or Recovery mode.
 2. Install [EdXposed](https://github.com/ElderDrivers/EdXposed/releases) in Magisk Manager or Recovery mode.
-3. Install [EdXposed Installer](https://github.com/solohsu/XposedInstaller/releases).
+3. Install [EdXposed Manager](https://github.com/ElderDrivers/EdXposedManager/releases).
 
 ## Get help
 
