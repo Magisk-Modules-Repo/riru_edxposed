@@ -6,7 +6,7 @@ EdXposed is a Magisk & [Riru](https://github.com/RikkaApps/Riru) module that pro
 
 ## Differences between EdXposed and Xposed
 
-- EdXposed supports Android Pie.
+- EdXposed supports Android Pie and Q.
 - EdXposed have a built-in black/white list mode, with which you can choose apps you don't want to hook into and vice versa.
 - EdXposed provides a so called instant modules mode(not recommended for normal users), which makes debugging and testing of modules more convenient and efficient.
 - EdXposed can pass SafetyNet checking on most devices.
