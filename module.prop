@@ -1,7 +1,7 @@
 id=riru_edxposed
 name=Riru - EdXposed
-version=v0.4.5.1_beta(4463) (YAHFA)
-versionCode=4463
-author=solohsu, rk700 & MlgmXyysd
-description=Magisk version of Xposed. Require Riru - Core v19+ installed. See change log in EdXposed Manager or Github Releases.
+version=v0.4.6.1 (4510) (YAHFA)
+versionCode=4510
+author=solohsu, MlgmXyysd & rk700
+description=Another enhanced implementation of Xposed Framework. Supports Android 8.0, 8.1, 9, 10 or above. Requires Riru - Core v19 or above installed. Telegram: @EdXposed
 api=4

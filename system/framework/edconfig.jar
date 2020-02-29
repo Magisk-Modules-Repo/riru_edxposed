@@ -1,5 +1,5 @@
-version=90.0-v0.4.5.1_beta(4463) (YAHFA)
+version=90.0-v0.4.6.1 (4510) (YAHFA)
 arch=arm64
 minsdk=26
-maxsdk=28
+maxsdk=29
 requires:fbe_aware=1

@@ -1,7 +1,0 @@
-id=riru_edxposed
-name=Riru - EdXposed
-version=v0.4.5.1_beta(4463) (YAHFA)
-versionCode=4463
-author=solohsu, rk700 & MlgmXyysd
-description=Magisk version of Xposed. Require Riru - Core v19+ installed. See change log in EdXposed Manager or Github Releases.
-api=4
