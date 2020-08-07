@@ -33,7 +33,7 @@ HUAWEI
 
 OLD_MAGISK=false
 DETECTED_DEVICE=false
-NO_PERSIST=false
+#NO_PERSIST=false
 
 abortC() {
   rm -rf "${MODPATH}"
@@ -41,21 +41,21 @@ abortC() {
 }
 
 require_new_magisk() {
-    if [[ "${NO_PERSIST}" == true ]]; then
-        ui_print "******************************"
-        ui_print "! Special device detected"
-        ui_print "! But persist is not found in your device, SEPolicy rules will not take effect correctly"
-        ui_print "! Deprecated custom Magisk v20.1 is required"
-        ui_print "! Change Magisk update channel to http://edxp.meowcat.org/repo/version.json"
-        ui_print "! And re-install Magisk"
-        abortC   "******************************"
-    else
+#    if [[ "${NO_PERSIST}" == true ]]; then
+#        ui_print "******************************"
+#        ui_print "! Special device detected"
+#        ui_print "! But persist is not found in your device, SEPolicy rules will not take effect correctly"
+#        ui_print "! Deprecated custom Magisk v20.1 is required"
+#        ui_print "! Change Magisk update channel to http://edxp.meowcat.org/repo/version.json"
+#        ui_print "! And re-install Magisk"
+#        abortC   "******************************"
+#    else
         ui_print "******************************"
         ui_print "! Special device detected"
         ui_print "! Magisk v20.2+ or custom Magisk v20.1(Deprecated) is required"
         ui_print "! You can update from 'Magisk Manager' or https://github.com/topjohnwu/Magisk/releases"
         abortC   "******************************"
-    fi
+#    fi
 }
 
 update_new_magisk() {
@@ -113,27 +113,27 @@ check_old_magisk_device() {
 
 check_magisk_version() {
     for TARGET in ${MODEL}; do
-        if [[ "${PROP_MODEL}" == ${TARGET} ]]; then
+        if [[ "${PROP_MODEL}" == "${TARGET}" ]]; then
             DETECTED_DEVICE=true
         fi
     done
     for TARGET in ${DEVICE}; do
-        if [[ "${PROP_DEVICE}" == ${TARGET} ]]; then
+        if [[ "${PROP_DEVICE}" == "${TARGET}" ]]; then
             DETECTED_DEVICE=true
         fi
     done
     for TARGET in ${PRODUCT}; do
-        if [[ "${PROP_PRODUCT}" == ${TARGET} ]]; then
+        if [[ "${PROP_PRODUCT}" == "${TARGET}" ]]; then
             DETECTED_DEVICE=true
         fi
     done
     for TARGET in ${BRAND}; do
-        if [[ "${PROP_BRAND}" == ${TARGET} ]]; then
+        if [[ "${PROP_BRAND}" == "${TARGET}" ]]; then
             DETECTED_DEVICE=true
         fi
     done
     for TARGET in ${MANUFACTURER}; do
-        if [[ "${PROP_MANUFACTURER}" == ${TARGET} ]]; then
+        if [[ "${PROP_MANUFACTURER}" == "${TARGET}" ]]; then
             DETECTED_DEVICE=true
         fi
     done
@@ -141,7 +141,7 @@ check_magisk_version() {
         ui_print "- Special device detected"
     fi
     ui_print "- Magisk version: ${MAGISK_VER_CODE}"
-    [[ ${MAGISK_VER_CODE} -ge 20101 ]] || check_old_magisk_device ${MAGISK_VER_CODE}
+    [[ ${MAGISK_VER_CODE} -ge 20101 ]] || check_old_magisk_device "${MAGISK_VER_CODE}"
     [[ ${MAGISK_VER_CODE} -eq 20101 ]] && update_new_magisk
 }
 
@@ -180,19 +180,19 @@ check_android_version() {
     if [[ ${API} -ge 26 ]]; then
         ui_print "- Android sdk: ${API}"
     else
-        require_new_android ${API}
+        require_new_android "${API}"
     fi
 }
 
-check_persist() {
-    if [[ "$(cat /proc/mounts | grep /sbin/.magisk/mirror/persist)" == "" ]]; then
-        NO_PERSIST=true
-    fi
-}
+#check_persist() {
+#    if [[ "$(cat /proc/mounts | grep /sbin/.magisk/mirror/persist)" == "" ]]; then
+#        NO_PERSIST=true
+#    fi
+#}
 
 ui_print "- EdXposed Version ${VERSION}"
 
-check_persist
+#check_persist
 check_magisk_version
 check_riru_version
 check_architecture
@@ -215,22 +215,29 @@ if [[ "${IS64BIT}" == false ]]; then
     rm -rf "${MODPATH}/system/lib64"
 fi
 
-if [[ ${BOOTMODE} == true && "$(pm path org.meowcat.edxposed.manager)" == "" ]]; then
+if [[ "$(pm path org.meowcat.edxposed.manager)" == "" && "$(pm path de.robv.android.xposed.installer)" == "" ]]; then
+    NO_MANAGER=true
+fi
+
+if [[ ${BOOTMODE} == true && ${NO_MANAGER} == true ]]; then
     ui_print "- Installing stub apk"
-    pm install ${MODPATH}/EdXposed.apk 2>&2
+    cp -f "${MODPATH}"/EdXposed.apk /data/local/tmp/
+    pm install /data/local/tmp/EdXposed.apk 2>&2
+    rm -rf /data/local/tmp/EdXposed.apk
 fi
 
 if [[ "${OLD_MAGISK}" == true ]]; then
     ui_print "- Removing SEPolicy rule for old Magisk"
-    rm ${MODPATH}/sepolicy.rule
+    rm "${MODPATH}"/sepolicy.rule
 fi
 
-if [[ "${NO_PERSIST}" == true ]]; then
-    ui_print "- Persist not detected, remove SEPolicy rule"
-	echo "- Mounted persist:" >&2
-	mount | grep persist >&2
-    rm ${MODPATH}/sepolicy.rule
-fi
+echo "- Mounted persist:" >&2
+mount | grep persist >&2
+
+#if [[ "${NO_PERSIST}" == true ]]; then
+#    ui_print "- Persist not detected, remove SEPolicy rule"
+#    rm ${MODPATH}/sepolicy.rule
+#fi
 
 ui_print "- Copying extra files"
 

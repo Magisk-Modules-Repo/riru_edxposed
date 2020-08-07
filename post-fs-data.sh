@@ -101,13 +101,7 @@ start_log_cather () {
         return
     fi
     touch ${LOG_FILE}
-    chcon ${PATH_CONTEXT} "${LOG_FILE}"
-    chown ${PATH_OWNER} "${LOG_FILE}"
-    chmod 666 ${LOG_FILE}
     touch ${PID_FILE}
-    chcon ${PATH_CONTEXT} "${PID_FILE}"
-    chown ${PATH_OWNER} "${PID_FILE}"
-    chmod 666 ${PID_FILE}
     echo "--------- beginning of head">>${LOG_FILE}
     echo "EdXposed Log">>${LOG_FILE}
     echo "Powered by Log Catcher">>${LOG_FILE}
@@ -127,21 +121,16 @@ start_log_cather () {
     echo "Android version: ${ANDROID}">>${LOG_FILE}
     echo "Android sdk: ${ANDROID_SDK}">>${LOG_FILE}
     echo "EdXposed version: ${EDXP_VERSION}">>${LOG_FILE}
-    echo "EdXposed api: 90.0">>${LOG_FILE}
+    echo "EdXposed api: 91.0">>${LOG_FILE}
     echo "Riru version: ${RIRU_VERSION} (${RIRU_VERCODE})">>${LOG_FILE}
     echo "Riru api: ${RIRU_APICODE}">>${LOG_FILE}
-    echo "Magisk: ${MAGISK_VERSION} (${MAGISK_VERCODE})">>${LOG_FILE}
+    echo "Magisk: ${MAGISK_VERSION%:*} (${MAGISK_VERCODE})">>${LOG_FILE}
     logcat -f ${LOG_FILE} *:S ${LOG_TAG_FILTERS} &
     LOG_PID=$!
     echo "${LOG_PID}">"${LOG_PATH}/${LOG_FILE_NAME}.pid"
-}
-
-start_verbose_log_catcher () {
-    start_log_cather all "EdXposed:V XSharedPreferences:V EdXposed-Bridge:V EdXposedManager:V XposedInstaller:V" true ${LOG_VERBOSE}
-}
-
-start_bridge_log_catcher () {
-    start_log_cather error "XSharedPreferences:V EdXposed-Bridge:V" true true
+    chcon -R ${PATH_CONTEXT} "${LOG_PATH}"
+    chown -R ${PATH_OWNER} "${LOG_PATH}"
+    chmod -R 666 "${LOG_PATH}"
 }
 
 # Backup app_process to avoid bootloop caused by original Xposed replacement in Android Oreo
@@ -152,17 +141,26 @@ cp -f "/system/bin/app_process32" "${MODDIR}/system/bin/app_process32"
 [[ -f "/system/bin/app_process64" ]] && cp -f "/system/bin/app_process64" "${MODDIR}/system/bin/app_process64"
 
 # install stub if manager not installed
-if [[ "$(pm path org.meowcat.edxposed.manager)" == "" ]]; then
-    pm install ${MODDIR}/EdXposed.apk 2>&2
+if [[ "$(pm path org.meowcat.edxposed.manager)" == "" && "$(pm path de.robv.android.xposed.installer)" == "" ]]; then
+    NO_MANAGER=true
+fi
+if [[ ${NO_MANAGER} == true ]]; then
+    cp -f ${MODDIR}/EdXposed.apk /data/local/tmp/
+    pm install /data/local/tmp/EdXposed.apk
+    rm -rf /data/local/tmp/EdXposed.apk
 fi
 
-start_verbose_log_catcher
-start_bridge_log_catcher
+# execute live patch if rule not found
+[[ -f "${MODDIR}/sepolicy.rule" ]] || sepolicy
+
+# start_verbose_log_catcher
+start_log_cather all "EdXposed:V XSharedPreferences:V EdXposed-Bridge:V EdXposedManager:V XposedInstaller:V" true ${LOG_VERBOSE}
+
+# start_bridge_log_catcher
+start_log_cather error "XSharedPreferences:V EdXposed-Bridge:V" true true
 
 [[ -d "${TARGET}" ]] || mkdir -p "${TARGET}"
 
 cp "${MODDIR}/module.prop" "${TARGET}/module.prop"
-
-[[ -f "${MODDIR}/sepolicy.rule" ]] || sepolicy
 
 chcon -R u:object_r:system_file:s0 "${MODDIR}"
