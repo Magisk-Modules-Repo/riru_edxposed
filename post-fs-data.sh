@@ -11,7 +11,8 @@ grep_prop() {
 MODDIR=${0%/*}
 
 RIRU_PATH="/data/misc/riru"
-TARGET="${RIRU_PATH}/modules/edxp"
+TARGET="${RIRU_PATH}/modules"
+[[ "$(getenforce)" == "Enforcing" ]] && ENFORCE=true || ENFORCE=false
 
 EDXP_VERSION=$(grep_prop version "${MODDIR}/module.prop")
 
@@ -84,6 +85,19 @@ if [[ -f ${DISABLE_VERBOSE_LOG_FILE} ]]; then
     LOG_VERBOSE=false
 fi
 
+# If logcat client is kicked out by klogd server, we'll restart it.
+# However, if it is killed manually or by EdXposed Manager, we'll exit.
+# Refer to https://github.com/ElderDrivers/EdXposed/pull/575 for more information.
+loop_logcat() {
+    while true
+    do
+        logcat $*
+        if [[ $? -ne 1 ]]; then
+            break
+        fi
+    done
+}
+
 start_log_cather () {
     LOG_FILE_NAME=$1
     LOG_TAG_FILTERS=$2
@@ -125,12 +139,9 @@ start_log_cather () {
     echo "Riru version: ${RIRU_VERSION} (${RIRU_VERCODE})">>${LOG_FILE}
     echo "Riru api: ${RIRU_APICODE}">>${LOG_FILE}
     echo "Magisk: ${MAGISK_VERSION%:*} (${MAGISK_VERCODE})">>${LOG_FILE}
-    logcat -f ${LOG_FILE} *:S ${LOG_TAG_FILTERS} &
+    loop_logcat -f ${LOG_FILE} *:S ${LOG_TAG_FILTERS} &
     LOG_PID=$!
     echo "${LOG_PID}">"${LOG_PATH}/${LOG_FILE_NAME}.pid"
-    chcon -R ${PATH_CONTEXT} "${LOG_PATH}"
-    chown -R ${PATH_OWNER} "${LOG_PATH}"
-    chmod -R 666 "${LOG_PATH}"
 }
 
 # Backup app_process to avoid bootloop caused by original Xposed replacement in Android Oreo
@@ -145,9 +156,9 @@ if [[ "$(pm path org.meowcat.edxposed.manager)" == "" && "$(pm path de.robv.andr
     NO_MANAGER=true
 fi
 if [[ ${NO_MANAGER} == true ]]; then
-    cp -f ${MODDIR}/EdXposed.apk /data/local/tmp/
-    pm install /data/local/tmp/EdXposed.apk
-    rm -rf /data/local/tmp/EdXposed.apk
+    ${ENFORCE} && setenforce 0
+    pm install "${MODDIR}/EdXposed.apk"
+    ${ENFORCE} && setenforce 1
 fi
 
 # execute live patch if rule not found
@@ -159,8 +170,14 @@ start_log_cather all "EdXposed:V XSharedPreferences:V EdXposed-Bridge:V EdXposed
 # start_bridge_log_catcher
 start_log_cather error "XSharedPreferences:V EdXposed-Bridge:V" true true
 
-[[ -d "${TARGET}" ]] || mkdir -p "${TARGET}"
 
-cp "${MODDIR}/module.prop" "${TARGET}/module.prop"
+if [[ -f "/data/misc/riru/modules/edxp.prop" ]]; then
+    CONFIG=$(cat "/data/misc/riru/modules/edxp.prop")
+    [[ -d "${TARGET}/${CONFIG}" ]] || mkdir -p "${TARGET}/${CONFIG}"
+    cp "${MODDIR}/module.prop" "${TARGET}/${CONFIG}/module.prop"
+fi
 
 chcon -R u:object_r:system_file:s0 "${MODDIR}"
+chcon -R ${PATH_CONTEXT} "${LOG_PATH}"
+chown -R ${PATH_OWNER} "${LOG_PATH}"
+chmod -R 666 "${LOG_PATH}"

@@ -1,6 +1,31 @@
 SKIPUNZIP=1
 
+getRandomNameExist() {
+    RAND_PATH=$4
+    RAND_SUFFIX=$3
+    RAND_PREFIX=$2
+    RAND_DIGIT=$1
+    RAND_RAND="$(cat /proc/sys/kernel/random/uuid|md5sum|cut -c 1-"${RAND_DIGIT}")"
+    RAND_PATH_EXIST=false
+    for TARGET in ${RAND_PATH}; do
+        if [[ -e "${TARGET}/${RAND_PREFIX}${RAND_RAND}${RAND_SUFFIX}" ]]; then
+            RAND_PATH_EXIST=true
+        fi
+    done
+    if [[ "${RAND_PATH_EXIST}" == true ]]; then
+        getRandomNameExist "${RAND_DIGIT}" "${RAND_PREFIX}" "${RAND_SUFFIX}" "${RAND_PATH}"
+    else
+        echo "${RAND_RAND}"
+    fi
+}
+
 RIRU_PATH="/data/misc/riru"
+RIRU_EDXP="$(getRandomNameExist 4 "libriru_" ".so" "
+/system/lib
+/system/lib64
+")"
+RIRU_MODULES="${RIRU_PATH}/modules"
+RIRU_TARGET="${RIRU_MODULES}/${RIRU_EDXP}"
 
 VERSION=$(grep_prop version "${TMPDIR}/module.prop")
 RIRU_MIN_API_VERSION=$(grep_prop api "${TMPDIR}/module.prop")
@@ -10,6 +35,28 @@ PROP_DEVICE=$(getprop ro.product.device)
 PROP_PRODUCT=$(getprop ro.build.product)
 PROP_BRAND=$(getprop ro.product.brand)
 PROP_MANUFACTURER=$(getprop ro.product.manufacturer)
+
+JAR_EDXP="$(getRandomNameExist 8 "" ".jar" "
+/system/framework
+").jar"
+JAR_EDDALVIKDX="$(getRandomNameExist 8 "" ".jar" "
+/system/framework
+").jar"
+JAR_EDDEXMAKER="$(getRandomNameExist 8 "" ".jar" "
+/system/framework
+").jar"
+JAR_EDCONFIG="$(getRandomNameExist 8 "" ".jar" "
+/system/framework
+").jar"
+LIB_RIRU_EDXP="libriru_${RIRU_EDXP}.so"
+LIB_WHALE_EDXP="lib$(getRandomNameExist 10 "lib" ".so" "
+/system/lib
+/system/lib64
+").so"
+LIB_SANDHOOK_EDXP="lib$(getRandomNameExist 13 "lib" ".so" "
+/system/lib
+/system/lib64
+").so"
 
 MODEL="
 HD1900
@@ -34,6 +81,7 @@ HUAWEI
 OLD_MAGISK=false
 DETECTED_DEVICE=false
 #NO_PERSIST=false
+[[ "$(getenforce)" == "Enforcing" ]] && ENFORCE=true || ENFORCE=false
 
 abortC() {
   rm -rf "${MODPATH}"
@@ -193,6 +241,7 @@ check_android_version() {
 ui_print "- EdXposed Version ${VERSION}"
 
 #check_persist
+check_android_version
 check_magisk_version
 check_riru_version
 check_architecture
@@ -221,9 +270,9 @@ fi
 
 if [[ ${BOOTMODE} == true && ${NO_MANAGER} == true ]]; then
     ui_print "- Installing stub apk"
-    cp -f "${MODPATH}"/EdXposed.apk /data/local/tmp/
-    pm install /data/local/tmp/EdXposed.apk 2>&2
-    rm -rf /data/local/tmp/EdXposed.apk
+    ${ENFORCE} && setenforce 0
+    (pm install "${MODPATH}/EdXposed.apk" >/dev/null 2>&2) || ui_print "  - Stub install failed! Do not forget install EdXposed Manager manually"
+    ${ENFORCE} && setenforce 1
 fi
 
 if [[ "${OLD_MAGISK}" == true ]]; then
@@ -231,23 +280,71 @@ if [[ "${OLD_MAGISK}" == true ]]; then
     rm "${MODPATH}"/sepolicy.rule
 fi
 
-echo "- Mounted persist:" >&2
-mount | grep persist >&2
+#echo "- Mounted persist:" >&2
+#mount | grep persist >&2
 
 #if [[ "${NO_PERSIST}" == true ]]; then
 #    ui_print "- Persist not detected, remove SEPolicy rule"
 #    rm ${MODPATH}/sepolicy.rule
 #fi
 
+ui_print "- Copying framework libraries"
+
+mv "${MODPATH}/system/framework/eddalvikdx.jar" "${MODPATH}/system/framework/${JAR_EDDALVIKDX}"
+mv "${MODPATH}/system/framework/edxp.jar" "${MODPATH}/system/framework/${JAR_EDXP}"
+mv "${MODPATH}/system/framework/eddexmaker.jar" "${MODPATH}/system/framework/${JAR_EDDEXMAKER}"
+mv "${MODPATH}/system/framework/edconfig.jar" "${MODPATH}/system/framework/${JAR_EDCONFIG}"
+mv "${MODPATH}/system/lib/libriru_edxp.so" "${MODPATH}/system/lib/${LIB_RIRU_EDXP}"
+mv "${MODPATH}/system/lib/libwhale.edxp.so" "${MODPATH}/system/lib/${LIB_WHALE_EDXP}"
+
+if [[ "${IS64BIT}" == true ]]; then
+    mv "${MODPATH}/system/lib64/libriru_edxp.so" "${MODPATH}/system/lib64/${LIB_RIRU_EDXP}"
+    mv "${MODPATH}/system/lib64/libwhale.edxp.so" "${MODPATH}/system/lib64/${LIB_WHALE_EDXP}"
+fi
+
+if [[ "${VARIANTS}" == "SandHook" ]]; then
+    mv "${MODPATH}/system/lib/libsandhook.edxp.so" "${MODPATH}/system/lib/${LIB_SANDHOOK_EDXP}"
+    if [[ "${IS64BIT}" == true ]]; then
+        mv "${MODPATH}/system/lib64/libsandhook.edxp.so" "${MODPATH}/system/lib64/${LIB_SANDHOOK_EDXP}"
+    fi
+fi
+
+ui_print "- Resetting libraries path"
+
+sed -i 's:/system/framework/edxp.jar\:/system/framework/eddalvikdx.jar\:/system/framework/eddexmaker.jar:/system/framework/'"${JAR_EDXP}"'\:/system/framework/'"${JAR_EDDALVIKDX}"'\:/system/framework/'"${JAR_EDDEXMAKER}"':g' "${MODPATH}/system/lib/${LIB_RIRU_EDXP}"
+sed -i 's:/system/framework/edconfig.jar:/system/framework/'"${JAR_EDCONFIG}"':g' "${MODPATH}/system/lib/${LIB_RIRU_EDXP}"
+sed -i 's:libriru_edxp.so:'"${LIB_RIRU_EDXP}"':g' "${MODPATH}/system/lib/${LIB_RIRU_EDXP}"
+sed -i 's:libwhale.edxp.so:'"${LIB_WHALE_EDXP}"':g' "${MODPATH}/system/lib/${LIB_RIRU_EDXP}"
+sed -i 's:libsandhook.edxp.so:'"${LIB_SANDHOOK_EDXP}"':g' "${MODPATH}/system/lib/${LIB_RIRU_EDXP}"
+
+if [[ "${IS64BIT}" == true ]]; then
+    sed -i 's:/system/framework/edxp.jar\:/system/framework/eddalvikdx.jar\:/system/framework/eddexmaker.jar:/system/framework/'"${JAR_EDXP}"'\:/system/framework/'"${JAR_EDDALVIKDX}"'\:/system/framework/'"${JAR_EDDEXMAKER}"':g' "${MODPATH}/system/lib64/${LIB_RIRU_EDXP}"
+    sed -i 's:/system/framework/edconfig.jar:/system/framework/'"${JAR_EDCONFIG}"':g' "${MODPATH}/system/lib64/${LIB_RIRU_EDXP}"
+    sed -i 's:libriru_edxp.so:'"${LIB_RIRU_EDXP}"':g' "${MODPATH}/system/lib64/${LIB_RIRU_EDXP}"
+    sed -i 's:libwhale.edxp.so:'"${LIB_WHALE_EDXP}"':g' "${MODPATH}/system/lib64/${LIB_RIRU_EDXP}"
+    sed -i 's:libsandhook.edxp.so:'"${LIB_SANDHOOK_EDXP}"':g' "${MODPATH}/system/lib64/${LIB_RIRU_EDXP}"
+fi
+
+ui_print "- Removing old configuration"
+
+if [[ -f "${RIRU_MODULES}/edxp.prop" ]]; then
+    OLD_CONFIG=$(cat "${RIRU_MODULES}/edxp.prop")
+    rm -rf "${RIRU_MODULES}/${OLD_CONFIG}"
+fi
+
+if [[ -e "${RIRU_MODULES}/edxp" ]]; then
+    rm -rf "${RIRU_MODULES}/edxp"
+fi
+
 ui_print "- Copying extra files"
 
-TARGET="${RIRU_PATH}/modules/edxp"
+[[ -d "${RIRU_TARGET}" ]] || mkdir -p "${RIRU_TARGET}" || abort "! Can't mkdir -p ${RIRU_TARGET}"
 
-[[ -d "${TARGET}" ]] || mkdir -p "${TARGET}" || abort "! Can't mkdir -p ${TARGET}"
+echo "${RIRU_EDXP}">"${RIRU_MODULES}/edxp.prop"
 
-rm "${TARGET}/module.prop"
+rm "${RIRU_TARGET}/module.prop"
 
-cp "${MODPATH}/module.prop" "${TARGET}/module.prop" || abort "! Can't create ${TARGET}/module.prop"
+cp "${MODPATH}/module.prop" "${RIRU_TARGET}/module.prop" || abort "! Can't create ${RIRU_TARGET}/module.prop"
 
 set_perm_recursive "${MODPATH}" 0 0 0755 0644
 
