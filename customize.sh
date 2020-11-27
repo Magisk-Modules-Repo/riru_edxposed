@@ -117,6 +117,7 @@ update_new_magisk() {
 require_riru() {
     ui_print "******************************"
     ui_print "! Requirement module 'Riru - Core' is not installed"
+    ui_print "! or unsupported v22+ is installed, use v21.3 instead"
     ui_print "! You can download from 'Magisk Manager' or https://github.com/RikkaApps/Riru/releases"
     abortC   "******************************"
 }
