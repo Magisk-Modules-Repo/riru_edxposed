@@ -1,7 +1,8 @@
 id=riru_edxposed
 name=Riru - EdXposed
-version=v0.4.6.4 (4563) (YAHFA)
-versionCode=4563
-author=solohsu, MlgmXyysd & rk700
-description=Another enhanced implementation of Xposed Framework. Supports Android 8.0, 8.1, 9, 10 or above. Requires Riru - Core v19 or above installed. Telegram: @EdXposed
-api=4
+version=v0.5.2.0_4672-master
+versionCode=4672
+author=solohsu, MlgmXyysd
+api=93
+description=Another enhanced implementation of Xposed Framework. Supports Android 8.0, 8.1, 9, 10, 11 or above. Requires Riru v23 or above installed. Telegram: @EdXposed
+minApi=10
