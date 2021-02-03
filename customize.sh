@@ -143,7 +143,6 @@ extract "${ZIPFILE}" 'sepolicy.rule' "${MODPATH}"
 extract "${ZIPFILE}" 'post-fs-data.sh' "${MODPATH}"
 extract "${ZIPFILE}" 'uninstall.sh' "${MODPATH}"
 
-extract "${ZIPFILE}" 'system/framework/edconfig.jar' "${MODPATH}"
 extract "${ZIPFILE}" 'system/framework/eddalvikdx.dex' "${MODPATH}"
 extract "${ZIPFILE}" 'system/framework/eddexmaker.dex' "${MODPATH}"
 extract "${ZIPFILE}" 'system/framework/edservice.dex' "${MODPATH}"
@@ -173,7 +172,7 @@ else
 fi
 
 if [[ ${BOOTMODE} == true ]]; then
-  [[ "$(pm path org.meowcat.edxposed.manager)" == "" && "$(pm path de.robv.android.xposed.installer)" == "" ]] && NO_MANAGER=true
+  [[ "$(pm path org.meowcat.edxposed.manager)" == "" ]] && NO_MANAGER=true
 fi
 
 if [[ ${BOOTMODE} == true && ${NO_MANAGER} == true ]]; then
