@@ -1,7 +1,7 @@
 id=riru_edxposed
 name=Riru - EdXposed
-version=v0.5.2.1_4677-master
-versionCode=4677
+version=v0.5.2.2_4683-master
+versionCode=4683
 author=solohsu, MlgmXyysd
 api=93
 description=Another enhanced implementation of Xposed Framework. Supports Android 8.0, 8.1, 9, 10, 11 or above. Requires Riru v23 or above installed. Telegram: @EdXposed
